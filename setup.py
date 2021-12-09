@@ -5,15 +5,15 @@ with open("README.md", "r") as rd:
     long_description = rd.read()
 
 setup(
-    name='PreProcessingNinja',
+    name='EasyReport',
     version='0.0.1',
-    description='A data preprocessing helper consists of your basic preprocessing needs',
-    author='Bijoy Kumar Roy',
-    url='https://github.com/Bijoy99roy/PreProcessingNinja',
+    description='Generate a quick EDA report of a pandas DataFrame',
+    author='Sumegh Sen',
+    url='https://github.com/Sumegh20/EasyReport',
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
-    keywords=['preprocessing', 'preprocessing ninja'],
+    keywords=['EDA', 'Exploratory Data Analysis', 'Easy Report', 'Dataset Report'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -24,6 +24,9 @@ setup(
     package_dir={'': 'src'},
     install_requires=[
         'pandas',
-        'seaborn'
+        'seaborn',
+        'scipy',
+        'matplotlib',
+        'missingno'
     ]
 )

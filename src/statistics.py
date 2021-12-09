@@ -18,14 +18,6 @@ class BasicStatistics:
               'Data Shape-------------------------------------------------')
         print(f'The shape of the dataset is {self.df.shape}')
 
-    def description(self):
-        """
-        Give the dataset description
-        """
-        print('\n-------------------------------------------------'
-              'Data Description-------------------------------------------------')
-        print(self.df.describe())
-
     def information(self):
         """
         Give the dataset basic information
@@ -80,6 +72,10 @@ class BasicStatistics:
                           round(self.df[feature].isnull().sum() / len(self.df), 2) * 100]
                }
         temp = pd.DataFrame(dec)
+        if self.df[feature].dtypes != 'object':
+            print('Attribute type: Ordinal')
+        else:
+            print('Attribute type: Categorical')
         print(temp)
         print('\nCategory Count Table')
         print(self.df[feature].value_counts())
@@ -113,6 +109,7 @@ class BasicStatistics:
                           len(self.df.loc[self.df[feature] > float(up)])]
                }
         temp = pd.DataFrame(dec)
+        print('Attribute type: Numerical')
         print(temp)
 
     def correlation(self):
