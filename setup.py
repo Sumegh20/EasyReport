@@ -6,7 +6,7 @@ with open("README.md", "r") as rd:
 
 setup(
     name='EasyReport',
-    version='0.0.1',
+    version='0.0.5',
     description='Generate a quick EDA report of a pandas DataFrame',
     author='Sumegh Sen',
     url='https://github.com/Sumegh20/EasyReport',
@@ -24,7 +24,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    py_module=['easy_report'],
+    py_modules=['easy_report'],
     package_dir={'': 'src'},
     install_requires=[
         'pandas==1.1.5',

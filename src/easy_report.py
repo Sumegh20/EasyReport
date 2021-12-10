@@ -1,5 +1,231 @@
-from src.statistics import BasicStatistics
-from src.graphs import Graphs
+import seaborn as sns
+import matplotlib.pyplot as plt
+import missingno as msno
+import pandas as pd
+import math
+from scipy.stats import skew, kurtosis
+
+
+class BasicStatistics:
+
+    def __init__(self, data, target_column, regression):
+        self.df = data
+        self.target_column_name = target_column
+        self.isRegression = regression
+
+    def shape(self):
+        """
+        Print the shape of the dataset
+        """
+        print('\n-------------------------------------------------'
+              'Data Shape-------------------------------------------------')
+        print(f'The shape of the dataset is {self.df.shape}')
+
+    def information(self):
+        """
+        Give the dataset basic information
+        """
+        print('\n-------------------------------------------------'
+              'Data information-------------------------------------------------')
+        self.df.info()
+
+    def missing_values(self):
+        """
+        Shows the number of missing values
+        """
+        print('-------------------------------------------------'
+              'Missing Value Table-------------------------------------------------')
+        print(pd.DataFrame(self.df.isnull().sum(), columns=['# Missing Values']))
+        print()
+
+    def duplicates(self):
+        """
+        Showes all the duplicate rows in the dataset
+        """
+        print('---------------------------------------------------'
+              'Duplicates Data---------------------------------------------------')
+        print(f'\n Numbers of Duplicates Row: {self.df.duplicated().sum()}')
+        if self.df.duplicated().sum() > 0:
+            temp = pd.DataFrame(self.df[self.df.duplicated()].value_counts())
+            temp = temp.rename(columns={0: '# Duplicates'})
+            print(temp)
+
+    def target_variable_statistical_summary(self):
+        """
+        Gives statistical values of the target variable
+        """
+        print('-------------------------------------------------', self.target_column_name,
+              '-------------------------------------------------')
+        try:
+            if self.isRegression:
+                self.numerical_statistical_summary(self.target_column_name)
+            else:
+                self.categorical_statistical_summary(self.target_column_name)
+        except Exception as e:
+            print(e)
+
+    def categorical_statistical_summary(self, feature):
+        """
+        Gives statistical values of the categorical variable
+
+        Parameters:
+        ---------------------------------------------------
+        Feature: (str) Name of the categorical variable
+        """
+        try:
+            dec = {'Stat': ['values', 'inc_na', 'exc_na', '# missing values', '% missing values'],
+                    'Values': [self.df[feature].unique(), len(self.df[feature].unique()),
+                          self.df[feature].nunique(), self.df[feature].isnull().sum(),
+                          round(self.df[feature].isnull().sum() / len(self.df), 2) * 100]
+                    }
+            temp = pd.DataFrame(dec)
+            if self.df[feature].dtypes != 'object':
+                print('Attribute type: Ordinal')
+            else:
+                print('Attribute type: Categorical')
+            print(temp)
+            print('\nCategory Count Table')
+            print(self.df[feature].value_counts())
+        except Exception as e:
+            print(e)
+
+    def numerical_statistical_summary(self, feature):
+        """
+        Gives statistical values of the numerical variable
+
+        Parameters:
+        ---------------------------------------------------
+        Feature: (str) Name of the numarical variable
+        """
+        try:
+            q1 = self.df[feature].quantile(0.25)
+            q3 = self.df[feature].quantile(0.75)
+            iqr = q3 - q1
+            up = q3 + 1.5 * iqr
+            lo = q1 - 1.5 * iqr
+
+            dec = {'Stat': ['Minimum', '1st Quartile', 'Median', '3rd Quartile', 'Maximum', 'Mean', 'Variance',
+                        'Standard deviation',
+                        'Coefficient of variation (CV)', 'Skewness', 'Kartosis', '# Missing Values', '% Missing Values',
+                        'IQR',
+                        'lower', 'upper', '# Outlier_upper', '# Outlier_lower'],
+                    'Values': [self.df[feature].min(), q1, self.df[feature].quantile(0.5), q3, self.df[feature].max(),
+                          self.df[feature].mean(), self.df[feature].var(), math.sqrt(self.df[feature].var()),
+                          math.sqrt(self.df[feature].var()) / self.df[feature].mean(),
+                          skew(self.df[feature], axis=0, bias=True),
+                          kurtosis(self.df[feature], axis=0, fisher=True, bias=True), self.df[feature].isnull().sum(),
+                          round(self.df[feature].isnull().sum() / len(self.df) * 100, 2), iqr, lo, up,
+                          len(self.df.loc[self.df[feature] < float(lo)]),
+                          len(self.df.loc[self.df[feature] > float(up)])]
+               }
+            temp = pd.DataFrame(dec)
+            print('Attribute type: Numerical')
+            print(temp)
+        except Exception as e:
+            print(e)
+
+    def correlation(self):
+        """
+        Show the correlation matrix
+        """
+        print('------------------------------------------------------'
+              'Correlation----------------------------------------------------\n')
+        try:
+            print(self.df.corr())
+        except Exception as e:
+            print(e)
+
+
+class Graphs:
+
+    def __init__(self, data, target_column, regression):
+        self.df = data
+        self.target_column_name = target_column
+        self.isRegression = regression
+
+    def target_variable_plot(self):
+        """
+        For Classification problem
+            It draws the Count plot of the target variable
+        For Regression problem
+            It draws Histogram, Box plot of the target variable
+        """
+        if self.isRegression:
+            fig, axes = plt.subplots(1, 2, figsize=(20, 5))
+            fig.add_subplot(121)
+            sns.histplot(x=self.target_column_name, data=self.df, color='red')
+            fig.add_subplot(122)
+            sns.boxplot(x=self.target_column_name, data=self.df)
+        else:
+            plt.figure(figsize=(10, 7))
+            sns.countplot(self.df[self.target_column_name])
+            plt.title("Plot the target column " + self.target_column_name, size=20)
+            plt.ylabel("Count", size=20)
+            plt.xlabel("Classes", size=20)
+            plt.show()
+
+    def categorical_graphical_summary(self, feature):
+        """
+        For Classification problem
+            It draws the Pie diagram and Countplot(Based on the target variable) of a categorical variable
+        For Regression problem
+            It draws the Pie diagram of a categorical variable and Boxplot of the target variable based
+            on the categorical variable
+
+        Parameters:
+        ---------------------------------------------------
+        Feature: (str) Name of the categorical variable
+        """
+        fig, axes = plt.subplots(1, 2, figsize=(20, 5))
+        fig.add_subplot(121)
+        values = self.df[feature].value_counts()
+        labels = self.df[feature].unique()
+        plt.pie(values, autopct='%.0f%%', labels=labels)
+        fig.add_subplot(122)
+        if self.isRegression:
+            sns.boxplot(x=feature, y=self.target_column_name, data=self.df)
+        else:
+            sns.countplot(x=feature, data=self.df, palette='muted', hue=self.target_column_name)
+        plt.show()
+
+    def numerical_graphical_summary(self, feature):
+        """
+        For Classification problem
+            It draws Histogram, Box plot and Histogram (Based on the target variable) of a numerical variable
+        For Regression problem
+            It draws Histogram, Box plot of a numerical variable and Scatter plot (target variable VS
+            numerical variable)
+
+        Parameters:
+        ---------------------------------------------------
+        Feature: (str) Name of the numerical variable
+        """
+        fig, axes = plt.subplots(1, 3, figsize=(20, 5))
+        fig.add_subplot(131)
+        sns.histplot(x=feature, data=self.df, color='red')
+        fig.add_subplot(132)
+        sns.boxplot(x=feature, data=self.df)
+        fig.add_subplot(133)
+        if self.isRegression:
+            sns.scatterplot(x=feature, y=self.target_column_name, data=self.df)
+        else:
+            sns.histplot(x=feature, data=self.df, hue=self.target_column_name)
+        plt.show()
+
+    def missing_value_plot(self):
+        """
+        A bar chart visualization of the nullity of the given DataFrame.
+        """
+        msno.bar(self.df, color='blue')
+
+    def correlation_heatmap(self):
+        """
+        Show the correlation heatmap
+        """
+        plt.figure(figsize=(20, 20))
+        sns.heatmap(self.df.corr(), annot=True)
+        plt.show()
+
 
 
 class EdaReport:
