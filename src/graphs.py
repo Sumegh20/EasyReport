@@ -13,7 +13,7 @@ class Graphs:
     def target_variable_plot(self):
         """
         For Classification problem
-            It draws the Countplot of the target variable
+            It draws the Count plot of the target variable
         For Regression problem
             It draws Histogram, Box plot of the target variable
         """
@@ -65,7 +65,7 @@ class Graphs:
 
         Parameters:
         ---------------------------------------------------
-        Feature: (str) Name of the numarical variable
+        Feature: (str) Name of the numerical variable
         """
         fig, axes = plt.subplots(1, 3, figsize=(20, 5))
         fig.add_subplot(131)

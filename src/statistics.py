@@ -53,10 +53,13 @@ class BasicStatistics:
         """
         print('-------------------------------------------------', self.target_column_name,
               '-------------------------------------------------')
-        if self.isRegression:
-            self.numerical_statistical_summary(self.target_column_name)
-        else:
-            self.categorical_statistical_summary(self.target_column_name)
+        try:
+            if self.isRegression:
+                self.numerical_statistical_summary(self.target_column_name)
+            else:
+                self.categorical_statistical_summary(self.target_column_name)
+        except Exception as e:
+            print(e)
 
     def categorical_statistical_summary(self, feature):
         """
@@ -66,19 +69,22 @@ class BasicStatistics:
         ---------------------------------------------------
         Feature: (str) Name of the categorical variable
         """
-        dec = {'Stat': ['values', 'inc_na', 'exc_na', '# missing values', '% missing values'],
-               'Values': [self.df[feature].unique(), len(self.df[feature].unique()),
+        try:
+            dec = {'Stat': ['values', 'inc_na', 'exc_na', '# missing values', '% missing values'],
+                    'Values': [self.df[feature].unique(), len(self.df[feature].unique()),
                           self.df[feature].nunique(), self.df[feature].isnull().sum(),
                           round(self.df[feature].isnull().sum() / len(self.df), 2) * 100]
-               }
-        temp = pd.DataFrame(dec)
-        if self.df[feature].dtypes != 'object':
-            print('Attribute type: Ordinal')
-        else:
-            print('Attribute type: Categorical')
-        print(temp)
-        print('\nCategory Count Table')
-        print(self.df[feature].value_counts())
+                    }
+            temp = pd.DataFrame(dec)
+            if self.df[feature].dtypes != 'object':
+                print('Attribute type: Ordinal')
+            else:
+                print('Attribute type: Categorical')
+            print(temp)
+            print('\nCategory Count Table')
+            print(self.df[feature].value_counts())
+        except Exception as e:
+            print(e)
 
     def numerical_statistical_summary(self, feature):
         """
@@ -88,18 +94,19 @@ class BasicStatistics:
         ---------------------------------------------------
         Feature: (str) Name of the numarical variable
         """
-        q1 = self.df[feature].quantile(0.25)
-        q3 = self.df[feature].quantile(0.75)
-        iqr = q3 - q1
-        up = q3 + 1.5 * iqr
-        lo = q1 - 1.5 * iqr
+        try:
+            q1 = self.df[feature].quantile(0.25)
+            q3 = self.df[feature].quantile(0.75)
+            iqr = q3 - q1
+            up = q3 + 1.5 * iqr
+            lo = q1 - 1.5 * iqr
 
-        dec = {'Stat': ['Minimum', '1st Quartile', 'Median', '3rd Quartile', 'Maximum', 'Mean', 'Variance',
+            dec = {'Stat': ['Minimum', '1st Quartile', 'Median', '3rd Quartile', 'Maximum', 'Mean', 'Variance',
                         'Standard deviation',
                         'Coefficient of variation (CV)', 'Skewness', 'Kartosis', '# Missing Values', '% Missing Values',
                         'IQR',
                         'lower', 'upper', '# Outlier_upper', '# Outlier_lower'],
-               'Values': [self.df[feature].min(), q1, self.df[feature].quantile(0.5), q3, self.df[feature].max(),
+                    'Values': [self.df[feature].min(), q1, self.df[feature].quantile(0.5), q3, self.df[feature].max(),
                           self.df[feature].mean(), self.df[feature].var(), math.sqrt(self.df[feature].var()),
                           math.sqrt(self.df[feature].var()) / self.df[feature].mean(),
                           skew(self.df[feature], axis=0, bias=True),
@@ -108,9 +115,11 @@ class BasicStatistics:
                           len(self.df.loc[self.df[feature] < float(lo)]),
                           len(self.df.loc[self.df[feature] > float(up)])]
                }
-        temp = pd.DataFrame(dec)
-        print('Attribute type: Numerical')
-        print(temp)
+            temp = pd.DataFrame(dec)
+            print('Attribute type: Numerical')
+            print(temp)
+        except Exception as e:
+            print(e)
 
     def correlation(self):
         """
@@ -118,4 +127,7 @@ class BasicStatistics:
         """
         print('------------------------------------------------------'
               'Correlation----------------------------------------------------\n')
-        print(self.df.corr())
+        try:
+            print(self.df.corr())
+        except Exception as e:
+            print(e)
