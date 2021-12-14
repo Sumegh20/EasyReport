@@ -150,15 +150,17 @@ class Graphs:
         For Regression problem
             It draws Histogram, Box plot of the target variable
         """
+        d1 = self.df.copy()
+
         if self.isRegression:
-            fig, axes = plt.subplots(1, 2, figsize=(20, 5))
-            fig.add_subplot(121)
-            sns.histplot(x=self.target_column_name, data=self.df, color='red')
-            fig.add_subplot(122)
-            sns.boxplot(x=self.target_column_name, data=self.df)
+            fig = plt.figure(figsize=(15, 5))
+            ax1 = fig.add_subplot(1, 2, 1)
+            sns.histplot(x=self.target_column_name, data=d1, color='red', ax=ax1)
+            ax2 = fig.add_subplot(1, 2, 2)
+            sns.boxplot(x=self.target_column_name, data=d1, ax=ax2)
         else:
             plt.figure(figsize=(10, 7))
-            sns.countplot(self.df[self.target_column_name])
+            sns.countplot(d1[self.target_column_name])
             plt.title("Plot the target column " + self.target_column_name, size=20)
             plt.ylabel("Count", size=20)
             plt.xlabel("Classes", size=20)
@@ -176,16 +178,24 @@ class Graphs:
         ---------------------------------------------------
         Feature: (str) Name of the categorical variable
         """
-        fig, axes = plt.subplots(1, 2, figsize=(20, 5))
-        fig.add_subplot(121)
-        values = self.df[feature].value_counts()
-        labels = self.df[feature].unique()
+        d1 = self.df.copy()
+
+        if d1[feature].isnull().sum() > 0:
+            d1[feature] = d1[feature].fillna('Missing')
+
+        fig = plt.figure(figsize=(15, 5))
+        fig.add_subplot(1, 2, 1)
+        values = d1[feature].value_counts()
+        labels = d1[feature].unique()
         plt.pie(values, autopct='%.0f%%', labels=labels)
-        fig.add_subplot(122)
+
+        ax2 = fig.add_subplot(1, 2, 2)
         if self.isRegression:
-            sns.boxplot(x=feature, y=self.target_column_name, data=self.df)
+            sns.boxplot(x=feature, y=self.target_column_name, data=d1, ax=ax2)
         else:
-            sns.countplot(x=feature, data=self.df, palette='muted', hue=self.target_column_name)
+            sns.countplot(x=feature, data=d1, palette='muted', hue=self.target_column_name, ax=ax2)
+
+        fig.tight_layout(pad=3.0)
         plt.show()
 
     def numerical_graphical_summary(self, feature):
@@ -200,32 +210,37 @@ class Graphs:
         ---------------------------------------------------
         Feature: (str) Name of the numerical variable
         """
-        fig, axes = plt.subplots(1, 3, figsize=(20, 5))
-        fig.add_subplot(131)
-        sns.histplot(x=feature, data=self.df, color='red')
-        fig.add_subplot(132)
-        sns.boxplot(x=feature, data=self.df)
-        fig.add_subplot(133)
+        d1 = self.df.copy()
+
+        fig = plt.figure(figsize=(20, 5))
+        ax1 = fig.add_subplot(1, 3, 1)
+        sns.histplot(x=feature, data=d1, color='red', ax=ax1)
+        ax2 = fig.add_subplot(1, 3, 2)
+        sns.boxplot(x=feature, data=d1, ax=ax2)
+        ax3 = fig.add_subplot(1, 3, 3)
         if self.isRegression:
-            sns.scatterplot(x=feature, y=self.target_column_name, data=self.df)
+            sns.scatterplot(x=feature, y=self.target_column_name, data=d1, ax=ax3)
         else:
-            sns.histplot(x=feature, data=self.df, hue=self.target_column_name)
+            sns.histplot(x=feature, data=d1, hue=self.target_column_name, ax=ax3)
+
+        fig.tight_layout(pad=3.0)
         plt.show()
 
     def missing_value_plot(self):
         """
         A bar chart visualization of the nullity of the given DataFrame.
         """
-        msno.bar(self.df, color='blue')
+        d1 = self.df.copy()
+        msno.bar(d1, color='#52be80')
 
     def correlation_heatmap(self):
         """
         Show the correlation heatmap
         """
+        d1 = self.df.copy()
         plt.figure(figsize=(20, 20))
-        sns.heatmap(self.df.corr(), annot=True)
+        sns.heatmap(d1.corr(), annot=True)
         plt.show()
-
 
 
 class EdaReport:
