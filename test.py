@@ -1,4 +1,4 @@
-from src.easy_report import EdaReport
+from EasyReport.easy_report import EdaReport
 import pandas as pd
 
 df = pd.read_csv("C:/Users/SUMEGH/Downloads/insurance.csv")
