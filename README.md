@@ -37,7 +37,7 @@ pip install EasyReport
 ### For Classification Problem
 ```python
 import pandas as pd
-from easy_report import EdaReport
+from EasyReport.easy_report import EdaReport
 
 #Read the dataset
 df = pd.read_csv("Dataset")
@@ -49,7 +49,7 @@ report.summary()
 ### For Regression Problem
 ```python
 import pandas as pd
-from easy_report import EdaReport
+from EasyReport.easy_report import EdaReport
 
 #Read the dataset
 df = pd.read_csv("Dataset")
